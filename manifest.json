@@ -1,0 +1,10 @@
+{
+  "domain": "my_integration",
+  "name": "Maintenance Manager",
+  "version": "1.0",
+  "documentation": "https://example.com",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["@Majky"],
+  "config_flow": true
+}
