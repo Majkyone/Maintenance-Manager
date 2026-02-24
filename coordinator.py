@@ -1,7 +1,6 @@
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.dispatcher import async_dispatcher_send
-from .const import DOMAIN, SIGNAL_TASK_STATE_CHANGED
+from .const import DOMAIN
 from datetime import datetime, timedelta
 import logging
 

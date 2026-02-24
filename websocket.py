@@ -2,7 +2,6 @@ import uuid
 import attrs
 from typing import Any
 import voluptuous as vol
-from homeassistant.helpers import entity_registry
 from homeassistant.components import websocket_api
 from homeassistant.components.websocket_api import connection, messages
 from homeassistant.core import HomeAssistant
@@ -112,7 +111,7 @@ def describeTask(msg: dict[str, Any]):
         duration=duration,
         last_completed=last_completed_str,
         fixed=msg.get("Fixed Interval", False),
-        option=msg.get("Option", ""),
+        option=msg.get("Attribute", ""),
         next_due=next_due,
     )
     return task
@@ -160,7 +159,7 @@ async def async_register_websocket(hass: HomeAssistant):
             vol.Optional("Repeat Every"): int,
             vol.Optional("Interval Type"): str,
             vol.Optional("Fixed Interval"): bool,
-            vol.Optional("Option"): str
+            vol.Optional("Attribute"): str
         })
     )
 
@@ -220,6 +219,6 @@ async def async_register_websocket(hass: HomeAssistant):
             vol.Optional("Interval Type"): str,
             vol.Optional("Fixed Interval"): bool,
             vol.Required("task_id"): str,
-            vol.Optional("Option"): str
+            vol.Optional("Attribute"): str
         })
     )

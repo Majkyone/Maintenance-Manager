@@ -1,7 +1,7 @@
 from homeassistant import config_entries
 from homeassistant.helpers import selector
 import voluptuous as vol
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_DEVICE_ID
+from homeassistant.const import CONF_NAME, CONF_DEVICE_ID
 from .const import DOMAIN
 from typing import Any
 
