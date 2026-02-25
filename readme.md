@@ -219,7 +219,7 @@ If the task remains overdue:
 - The next reminder will always be sent the following day at **09:00**.
 - Daily reminders continue until the task is completed.
 
-All time calculations respect the Home Assistant configured timezone.
+All time calculations are based on the system time of the Home Assistant instance.
 
 ---
 

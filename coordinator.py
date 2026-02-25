@@ -4,7 +4,7 @@ from .const import DOMAIN
 from datetime import datetime, timedelta
 import logging
 
-_LOGGER = logging.getLogger("custom_components.my_integration")
+_LOGGER = logging.getLogger("custom_components.maintenance_manager")
 
 
 class MaintananceCoordinator(DataUpdateCoordinator):

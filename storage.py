@@ -11,7 +11,7 @@ from dateutil.relativedelta import relativedelta
 import attrs
 from .Models.mapping_config import MAPPING
 
-_LOGGER = getLogger("custom_components.my_integration")
+_LOGGER = getLogger("custom_components.maintenance_manager")
 
 
 class HomeMaintananceStorage:
@@ -136,7 +136,6 @@ class HomeMaintananceStorage:
             if field == "next_due" and existing.notified:
                 continue
             if field == "next_due" and existing.seasonal_type == "runtime":
-                _LOGGER.warning(old_interval, " ", existing.seasonal_interval)
                 delta = existing.seasonal_interval - old_interval
                 existing.next_due += delta * 3600 # prepisat na hours * 3600
                 continue
@@ -158,7 +157,6 @@ class HomeMaintananceStorage:
         attrs = state.attributes
         # is_on vymysliet
         
-        _LOGGER.warning(domain)
         found = [
             item for item in MAPPING
             if domain in item["domain"] and (
@@ -184,7 +182,6 @@ class HomeMaintananceStorage:
                 "options": attrs.get(item["search"]) or item["options_list"],
             }]
         
-        _LOGGER.warning("Nic")
         return {
             "control": "text"
         }

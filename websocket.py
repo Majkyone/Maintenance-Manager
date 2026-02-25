@@ -11,7 +11,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
 import logging
 
-_LOGGER = logging.getLogger("custom_components.my_integration")
+_LOGGER = logging.getLogger("custom_components.maintenance_manager")
 
 def web_socket_get_tasks(hass: HomeAssistant, connection: connection.ActiveConnection, msg: dict[str, Any]):
     storage = hass.data[DOMAIN].get("storage")
@@ -41,7 +41,6 @@ def web_socket_detete_task(hass: HomeAssistant, connection: connection.ActiveCon
         storage.async_delete_task(task_id)
         connection.send_result(msg["id"], {"success": True})
     else:
-        _LOGGER.warning("Failed storage async")
         connection.send_result(msg["id"], {"success": False, "message": "Task not found"})
 
 def web_socket_complete_task(hass: HomeAssistant, connection: connection.ActiveConnection, msg: dict[str, Any]):
@@ -54,7 +53,6 @@ def web_socket_complete_task(hass: HomeAssistant, connection: connection.ActiveC
             storage.async_create_history(task_id, msg["Completion Notes"])
         connection.send_result(msg["id"], {"success": True, "message": msg.get("Completion Notes", "no notes")})
     else:
-        _LOGGER.warning("Failed storage async")
         connection.send_result(msg["id"], {"success": False, "message": "Task not found"})
 
 def web_socket_get_attributes(hass: HomeAssistant, connection: connection.ActiveConnection, msg: dict[str, Any]):
@@ -119,28 +117,28 @@ def describeTask(msg: dict[str, Any]):
 async def async_register_websocket(hass: HomeAssistant):
     websocket_api.async_register_command(
         hass,
-        "my_integration/get_tasks",
+        "maintenance_manager/get_tasks",
         web_socket_get_tasks,
         messages.BASE_COMMAND_MESSAGE_SCHEMA.extend({
-            vol.Required("type"): "my_integration/get_tasks",
+            vol.Required("type"): "maintenance_manager/get_tasks",
         })
     )
 
     websocket_api.async_register_command(
         hass,
-        "my_integration/get_history",
+        "maintenance_manager/get_history",
         web_socket_get_history,
         messages.BASE_COMMAND_MESSAGE_SCHEMA.extend({
-            vol.Required("type"): "my_integration/get_history",
+            vol.Required("type"): "maintenance_manager/get_history",
         })
     )
 
     websocket_api.async_register_command(
         hass,
-        "my_integration/create_task",
+        "maintenance_manager/create_task",
         web_socket_create_task,
         messages.BASE_COMMAND_MESSAGE_SCHEMA.extend({
-            vol.Required("type"): "my_integration/create_task",
+            vol.Required("type"): "maintenance_manager/create_task",
             vol.Optional("Description"): str,
             vol.Optional("Type"): str,
             vol.Required("Task Name"): str,
@@ -165,20 +163,20 @@ async def async_register_websocket(hass: HomeAssistant):
 
     websocket_api.async_register_command(
         hass,
-        "my_integration/delete_task",
+        "maintenance_manager/delete_task",
         web_socket_detete_task,
         messages.BASE_COMMAND_MESSAGE_SCHEMA.extend({
-            vol.Required("type"): "my_integration/delete_task",
+            vol.Required("type"): "maintenance_manager/delete_task",
             vol.Required("task_id"): str,
         })
     )
 
     websocket_api.async_register_command(
         hass,
-        "my_integration/complete_task",
+        "maintenance_manager/complete_task",
         web_socket_complete_task,
         messages.BASE_COMMAND_MESSAGE_SCHEMA.extend({
-            vol.Required("type"): "my_integration/complete_task",
+            vol.Required("type"): "maintenance_manager/complete_task",
             vol.Required("task_id"): str,
             vol.Optional("Completion Notes"): str,
         })
@@ -186,20 +184,20 @@ async def async_register_websocket(hass: HomeAssistant):
 
     websocket_api.async_register_command(
         hass,
-        "my_integration/get_attributes",
+        "maintenance_manager/get_attributes",
         web_socket_get_attributes,
         messages.BASE_COMMAND_MESSAGE_SCHEMA.extend({
-            vol.Required("type"): "my_integration/get_attributes",
+            vol.Required("type"): "maintenance_manager/get_attributes",
             vol.Required("task_sensor"): str,
         })
     )
 
     websocket_api.async_register_command(
         hass,
-        "my_integration/edit_task",
+        "maintenance_manager/edit_task",
         web_socket_edit_task,
         messages.BASE_COMMAND_MESSAGE_SCHEMA.extend({
-            vol.Required("type"): "my_integration/edit_task",
+            vol.Required("type"): "maintenance_manager/edit_task",
             vol.Optional("Description"): str,
             vol.Optional("Type"): str,
             vol.Required("Task Name"): str,

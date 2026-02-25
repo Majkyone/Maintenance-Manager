@@ -9,7 +9,7 @@ from .storage import HomeMaintananceStorage
 from .coordinator import MaintananceCoordinator
 import logging
 
-_LOGGER = logging.getLogger("custom_components.my_integration")
+_LOGGER = logging.getLogger("custom_components.maintenance_manager")
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
