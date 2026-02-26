@@ -1,6 +1,7 @@
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import device_registry
+from homeassistant.util import slugify
 from homeassistant.const import CONF_NAME, CONF_DEVICE_ID
 from .const import DOMAIN
 from .panel import async_register_panel, async_unregister_panel
@@ -34,14 +35,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     
     dev_reg = device_registry.async_get(hass)
     device_to_notify = dev_reg.devices.get(entry.data[CONF_DEVICE_ID])
-    
+
+    if device_to_notify is None:
+        _LOGGER.error("Device %s not found", entry.data[CONF_DEVICE_ID])
+        return False
+
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN] = {
         "device_id": device.id,
         "storage": storage,
         "coordinator": coordinator,
         "entities": {},
-        "mobile_app_entity_id": device_to_notify.name,
+        "mobile_app_entity_id": slugify(device_to_notify.name),
     }
     await hass.config_entries.async_forward_entry_setups(entry, ["binary_sensor"])
     await async_register_panel(hass, entry)
@@ -55,8 +60,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
         ["binary_sensor"],
     )
     if unload_ok:
-        await hass.data[DOMAIN]["storage"].async_clear_all()
-        hass.data.pop(DOMAIN, None)
-        if not hass.data.get(DOMAIN):
-            await async_unregister_panel(hass)
+        await async_unregister_panel(hass)
     return unload_ok
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry):
+    storage = hass.data.get(DOMAIN, {}).get("storage")
+    if storage:
+        await storage.async_clear_all()
+    hass.data.pop(DOMAIN, None)

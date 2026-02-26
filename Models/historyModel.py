@@ -24,7 +24,7 @@ class HomeMaintananceHistory:
             completion_dates=[
                 CompletionRecord(
                     date=datetime.fromisoformat(item["date"]),
-                    note=item.get("note", "")
+                    note=item.get("note", "No notes provided.")
                 )
                 for item in data["completion_dates"]
             ],

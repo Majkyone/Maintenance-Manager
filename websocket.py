@@ -41,6 +41,7 @@ def web_socket_detete_task(hass: HomeAssistant, connection: connection.ActiveCon
         storage.async_delete_task(task_id)
         connection.send_result(msg["id"], {"success": True})
     else:
+        _LOGGER.warning("Failed storage async")
         connection.send_result(msg["id"], {"success": False, "message": "Task not found"})
 
 def web_socket_complete_task(hass: HomeAssistant, connection: connection.ActiveConnection, msg: dict[str, Any]):
@@ -48,11 +49,12 @@ def web_socket_complete_task(hass: HomeAssistant, connection: connection.ActiveC
     storage = hass.data[DOMAIN]["storage"]
     if task_id in storage.tasks:
         if task_id in storage.history:
-            storage.async_add_completion_date(task_id, msg["Completion Notes"])
+            storage.async_add_completion_date(task_id, msg.get("Completion Notes", "No notes provided."))
         else:
-            storage.async_create_history(task_id, msg["Completion Notes"])
-        connection.send_result(msg["id"], {"success": True, "message": msg.get("Completion Notes", "no notes")})
+            storage.async_create_history(task_id, msg.get("Completion Notes", "No notes provided."))
+        connection.send_result(msg["id"], {"success": True, "message": msg.get("Completion Notes", "No notes provided.")})
     else:
+        _LOGGER.warning("Failed storage async")
         connection.send_result(msg["id"], {"success": False, "message": "Task not found"})
 
 def web_socket_get_attributes(hass: HomeAssistant, connection: connection.ActiveConnection, msg: dict[str, Any]):
@@ -140,7 +142,7 @@ async def async_register_websocket(hass: HomeAssistant):
         messages.BASE_COMMAND_MESSAGE_SCHEMA.extend({
             vol.Required("type"): "maintenance_manager/create_task",
             vol.Optional("Description"): str,
-            vol.Optional("Type"): str,
+            vol.Required("Type"): str,
             vol.Required("Task Name"): str,
             vol.Optional("Sensor"): str,
             vol.Optional("Control"): str,
@@ -199,7 +201,7 @@ async def async_register_websocket(hass: HomeAssistant):
         messages.BASE_COMMAND_MESSAGE_SCHEMA.extend({
             vol.Required("type"): "maintenance_manager/edit_task",
             vol.Optional("Description"): str,
-            vol.Optional("Type"): str,
+            vol.Required("Type"): str,
             vol.Required("Task Name"): str,
             vol.Optional("Value"): vol.Any(int, str),
             vol.Optional("Sensor"): str,

@@ -42,7 +42,7 @@ class MaintananceCoordinator(DataUpdateCoordinator):
             condition_met = False
             state_obj = self.hass.states.get(task.sensor)
             if state_obj is None:
-                return
+                continue
             options = ["activity", "action", "states", "turn_on", "condition"]
             value_to_check = state_obj.attributes.get(task.option) if task.option and task.option not in options else None
            
@@ -52,7 +52,7 @@ class MaintananceCoordinator(DataUpdateCoordinator):
                 try:
                     value_to_check = float(value_to_check)
                 except (ValueError, TypeError):
-                    return
+                    continue
 
                 if task.operator == "below" and value_to_check < task.value:
                     condition_met = True
@@ -99,7 +99,7 @@ class MaintananceCoordinator(DataUpdateCoordinator):
         self.storage.async_notified_task(task.id, True, (datetime.now() + timedelta(days=1)).replace(hour=9, minute=0, second=0, microsecond=0).isoformat())
         await self.hass.services.async_call(
             "notify",
-            f"mobile_app_{self.notify_service.replace('-', '_').lower()}",
+            f"mobile_app_{self.notify_service}",
             {
                 "title": f"Home Maintenance: {task.name}",
                 "message": f"{task.description}",

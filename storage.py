@@ -121,10 +121,9 @@ class HomeMaintananceStorage:
         )
 
         if task_to_remove is None:
-            raise RuntimeError(f"No entity found with task ID {task_id}.")
-
-        # Remove the entity
-        er.async_remove(task_to_remove.entity_id)
+            _LOGGER.warning("Failed to find entity to remove for task_id: %s", task_id)
+        else:
+            er.async_remove(task_to_remove.entity_id)
 
         self._async_save_task_history()
 
@@ -136,7 +135,7 @@ class HomeMaintananceStorage:
             if field == "next_due" and existing.notified:
                 continue
             if field == "next_due" and existing.seasonal_type == "runtime":
-                delta = existing.seasonal_interval - old_interval
+                delta = task.seasonal_interval - old_interval
                 existing.next_due += delta * 3600 # prepisat na hours * 3600
                 continue
             if getattr(existing, field) != new_value:
@@ -153,6 +152,12 @@ class HomeMaintananceStorage:
 
     def describe_entity(self, sensor):
         state = self.hass.states.get(sensor)
+        if state is None:
+            _LOGGER.warning("Entity %s not found", sensor)
+            return [{
+                "control": "None"
+            }]
+
         domain = state.entity_id.split(".")[0]
         attrs = state.attributes
         # is_on vymysliet
@@ -182,6 +187,6 @@ class HomeMaintananceStorage:
                 "options": attrs.get(item["search"]) or item["options_list"],
             }]
         
-        return {
+        return [{
             "control": "text"
-        }
+        }]
